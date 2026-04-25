@@ -1,0 +1,91 @@
+{% extends 'dashboard/admin/base_admin.html' %}
+
+{% block content %}
+  <!-- TOAST -->
+  <div id="toast" class="hidden fixed top-5 right-5 bg-green-500 text-white px-4 py-2 rounded shadow z-50"></div>
+
+  <!-- PARTICIPANTS -->
+  <div class="bg-white shadow rounded-lg p-5 mb-8">
+    <h3 class="text-lg font-semibold mb-4">Participants</h3>
+
+    {% if not participants %}
+      <p class="text-gray-500">No participants available.</p>
+    {% else %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 border">Image</th> <th class="p-3 border">Name</th> <th class="p-3 border">Action</th>
+            </tr>
+          </thead> <tbody>
+            {% for p in participants %}
+              <tr class="hover:bg-gray-50">
+                <td class="p-3 border">
+                  <img src="{{ p.image_url }}" class="h-10 w-10 rounded-full object-cover" />
+                </td> <td class="p-3 border">{{ p.name }}</td> <td class="p-3 border">
+                  <a href="{{ url_for('delete_participant', id=p.id) }}" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="return confirm('Delete this participant?')">Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- USERS -->
+  <div class="bg-white shadow rounded-lg p-5">
+    <h3 class="text-lg font-semibold mb-4">Users</h3>
+    {% if not users %}
+      <p class="text-gray-500">No users found.</p>
+    {% else %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="p-3 border">Name</th> <th class="p-3 border">Email</th> <th class="p-3 border">Role</th> <th class="p-3 border">Action</th>
+            </tr>
+          </thead> <tbody>
+            {% for u in users %}
+              <tr class="hover:bg-gray-50">
+                <td class="p-3 border">{{ u.name }}</td> <td class="p-3 border">{{ u.email }}</td> <td class="p-3 border capitalize">{{ u.role }}</td> <td class="p-3 border">
+                  {% if u.role != 'admin' %}
+                    <a href="{{ url_for('delete_user', id=u.id) }}" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" onclick="return confirm('Delete this user?')">Delete</a>
+                  {% else %}
+                    <span class="text-gray-400">Protected</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    const urlParams = new URLSearchParams(window.location.search)
+    const toast = document.getElementById('toast')
+    
+    if (urlParams.get('success') === '1') {
+      showToast('Participant added successfully')
+    }
+    
+    if (urlParams.get('deleted') === '1') {
+      showToast('Deleted successfully ')
+    }
+    
+    function showToast(message) {
+      toast.textContent = message
+      toast.classList.remove('hidden')
+    
+      setTimeout(() => {
+        toast.classList.add('hidden')
+      }, 2000)
+    
+      // clean URL
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
+  </script>
+{% endblock %}

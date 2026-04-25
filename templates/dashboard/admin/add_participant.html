@@ -1,0 +1,24 @@
+{% extends 'dashboard/admin/base_admin.html' %}
+
+{% block content %}
+  <div class="flex justify-center">
+    <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md transform transition hover:scale-[1.01]">
+      <form method="POST" class="space-y-5">
+        <!-- NAME -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Participant Name</label>
+          <input type="text" name="name" placeholder="Enter name" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+        </div>
+
+        <!-- IMAGE URL -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">Image URL</label>
+          <input type="text" name="image_url" placeholder="https://example.com/image.jpg" class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition" required />
+        </div>
+
+        <!-- BUTTON -->
+        <button type="submit" class="w-full py-3 rounded-lg text-white font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition duration-300 shadow-md hover:shadow-lg">Add Participant</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

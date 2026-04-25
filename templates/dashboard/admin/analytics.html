@@ -1,0 +1,181 @@
+{% extends 'dashboard/admin/base_admin.html' %}
+
+{% block content %}
+  <!-- STATS CARDS -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- TOTAL VOTES -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-gray-500">Total Votes</h3>
+      <p class="text-2xl font-bold">{{ total_votes|default(0) }}</p>
+    </div>
+
+    <!-- TOTAL CANDIDATES -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-gray-500">Total Candidates</h3>
+      <p class="text-2xl font-bold">{{ labels|default([])|length }}</p>
+    </div>
+
+    <!-- VOTE PERCENTAGE -->
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="text-gray-500">Vote Percentage</h3>
+      <p class="text-2xl font-bold text-blue-600">{{ vote_percentage|default(0) }}%</p>
+    </div>
+  </div>
+
+  <!-- winner Button -->
+  <div class="flex justify-center mb-6">
+    <button id="showWinner" class="bg-indigo-600 text-white px-6 py-2 rounded-lg shadow hover:bg-indigo-700 transition">Show Winner</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Winner Card -->
+  <div id="winnerCard" class="hidden bg-white p-6 rounded-xl shadow mb-8 text-center transition transform duration-500 scale-95 opacity-0">
+    {% if winners %}
+      <h2 class="text-2xl font-bold text-green-600 mb-4">
+        🏆{% if winners|length > 1 %}
+          Winners
+        {% else %}
+          Winner
+        {% endif %}
+      </h2>
+
+      <div class="flex flex-wrap justify-center gap-6">
+        {% for w in winners %}
+          <div class="text-center">
+            <img src="{{ w.image_url }}" class="h-24 w-24 rounded-full mx-auto mb-2 border-4 border-yellow-400" />
+
+            <p class="font-semibold">{{ w.name }}</p>
+            <p class="text-gray-500">Votes: {{ w.votes }}</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if winners|length > 1 %}
+        <p class="mt-4 text-yellow-600 font-semibold">🔥 It's a tie!</p>
+      {% endif %}
+    {% else %}
+      <p class="text-gray-500">No winner yet</p>
+    {% endif %}
+  </div>
+
+  <div class="flex justify-end mb-4">
+    <a href="{{ url_for('export_results') }}" class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700">Export Results (CSV)</a>
+  </div>
+
+  <!-- CHART -->
+  <div class="bg-white p-6 rounded-xl shadow">
+    <h3 class="text-lg font-semibold mb-4">Votes per Participant</h3>
+    <canvas id="voteChart"></canvas>
+  </div>
+
+  <!-- Pie Chart -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="mb-4 font-semibold">Vote Distribution</h3>
+      <canvas id="pie1"></canvas>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow">
+      <h3 class="mb-4 font-semibold">Voting Status</h3>
+      <canvas id="pie2"></canvas>
+    </div>
+  </div>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // GLOBAL DATA (FIX)
+      const labels = JSON.parse('{{ labels | default([]) | tojson | safe }}')
+      const values = JSON.parse('{{ values | default([]) | tojson | safe }}')
+    
+      const totalUsers = Number('{{ total_users | default(0) }}')
+      const votedUsers = Number('{{ total_votes | default(0) }}')
+      const notVoted = Math.max(totalUsers - votedUsers, 0)
+    
+      // BAR CHART
+      const barCtx = document.getElementById('voteChart')
+    
+      if (barCtx) {
+        new Chart(barCtx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Votes',
+                data: values,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316', '#6366f1']
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              y: { beginAtZero: true }
+            }
+          }
+        })
+      }
+    
+      // PIE 1 - PARTICIPANTS
+      const pie1 = document.getElementById('pie1')
+    
+      if (pie1) {
+        new Chart(pie1, {
+          type: 'pie',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                data: values,
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316', '#6366f1']
+              }
+            ]
+          }
+        })
+      }
+    
+      // PIE 2 - VOTING STATUS
+      const pie2 = document.getElementById('pie2')
+    
+      if (pie2) {
+        new Chart(pie2, {
+          type: 'pie',
+          data: {
+            labels: ['Voted', 'Not Voted'],
+            datasets: [
+              {
+                data: [votedUsers, notVoted],
+                backgroundColor: ['#10b981', '#ef4444']
+              }
+            ]
+          }
+        })
+      }
+    
+      // WINNER BUTTON
+      const btn = document.getElementById('showWinner')
+      const card = document.getElementById('winnerCard')
+    
+      if (btn && card) {
+        btn.addEventListener('click', () => {
+          card.classList.remove('hidden')
+    
+          setTimeout(() => {
+            card.classList.remove('scale-95', 'opacity-0')
+            card.classList.add('scale-100', 'opacity-100')
+          }, 50)
+    
+          confetti({
+            particleCount: 200,
+            spread: 120,
+            origin: { y: 0.6 }
+          })
+        })
+      }
+    })
+  </script>
+{% endblock %}

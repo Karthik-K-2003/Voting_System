@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  </head>
+
+  <body class="bg-gradient-to-r from-blue-300 to-blue-200 flex items-center justify-center h-screen">
+    <div class="bg-indigo-100 p-8 rounded-2xl shadow-lg w-96">
+      <h2 class="text-2xl font-bold text-center mb-6">Create Account</h2>
+
+      <form action="#" method="POST">
+        <input type="text" name="name" placeholder="Full Name" class="w-full p-2 border rounded mb-4" required />
+        <input type="email" name="email" placeholder="Email" class="w-full p-2 border rounded mb-4" required />
+
+        <div class="relative mb-4">
+          <input type="password" id="register_password" name="password" placeholder="Password" class="w-full p-2 border rounded pr-10" required />
+          <span onclick="togglePassword()" class="absolute right-3 top-2.5 cursor-pointer text-gray-600 material-icons" id="register_toggleIcon">visibility_off</span>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Register</button>
+      </form>
+
+      <p class="text-sm text-center mt-4">
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="text-blue-500 hover:underline">Login</a>
+      </p>
+    </div>
+  </body>
+
+  <script>
+    function togglePassword() {
+      const password = document.getElementById('register_password')
+      const icon = document.getElementById('register_toggleIcon')
+    
+      if (password.type == 'password') {
+        password.type = 'text'
+        icon.textContent = 'visibility'
+      } else {
+        password.type = 'password'
+        icon.textContent = 'visibility_off'
+      }
+    }
+  </script>
+</html>

@@ -1,0 +1,36 @@
+{% extends 'dashboard/user/base_user.html' %}
+
+{% block content %}
+  <div id="toast" class="hidden fixed top-5 right-5 bg-gray-800 text-white px-4 py-2 rounded shadow z-50"></div>
+  {% if not participants %}
+    <div class="flex items-center justify-center h-[60vh]">
+      <div class="bg-white p-6 rounded-lg shadow text-center">
+        <p class="text-gray-500 text-lg font-medium">No Participants Available !!!</p>
+      </div>
+    </div>
+  {% else %}
+    <div class="max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for p in participants %}
+          <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <img src="{{ p.image_url }}" class="h-32 w-32 object-cover rounded-full mx-auto mb-3 border-4 border-blue-100" />
+            <button class="vote-btn w-full py-2 rounded border border-gray-300 
+              {% if voted_participant and voted_participant == p.id %}
+                bg-green-500 text-white
+              {% elif voted_participant %}
+                 bg-gray-300 cursor-not-allowed
+              {% else %}
+              bg-white hover:bg-gray-100
+              {% endif %}"
+              data-id="{{ p.id }}"
+              {% if voted_participant %} disabled {% endif %}>
+              {{ p.name }}
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+
+  <script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'dashboard/admin/base_admin.html' %}
+
+{% block content %}
+  <!-- VOTED USERS -->
+  <div class="bg-white shadow rounded-lg p-5 mb-8">
+    <h3 class="text-lg font-semibold mb-4 text-green-600">Users Who Voted</h3>
+
+    {% if not voted_users %}
+      <p class="text-gray-500">No users have voted yet.</p>
+    {% else %}
+      <table class="w-full border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-3 border">Name</th> <th class="p-3 border">Email</th>
+          </tr>
+        </thead> <tbody>
+          {% for u in voted_users %}
+            <tr class="hover:bg-gray-50">
+              <td class="p-3 border text-center">{{ u.name }}</td> 
+              <td class="p-3 border text-center">{{ u.email }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+
+  <!-- NOT VOTED USERS -->
+  <div class="bg-white shadow rounded-lg p-5">
+    <h3 class="text-lg font-semibold mb-4 text-red-600">Users Who Have Not Voted</h3>
+
+    {% if not non_voted_users %}
+      <p class="text-gray-500">All users have voted</p>
+    {% else %}
+      <table class="w-full border">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="p-3 border">Name</th> <th class="p-3 border">Email</th>
+          </tr>
+        </thead> <tbody>
+          {% for u in non_voted_users %}
+            <tr class="hover:bg-gray-50">
+              <td class="p-3 border text-center">{{ u.name }}</td> 
+              <td class="p-3 border text-center">{{ u.email }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}
